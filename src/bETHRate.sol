@@ -37,7 +37,7 @@ contract bETHRate is IRateProvider {
         int256 _bETHprice;
         _bETHprice = bETHPriceFeed.latestAnswer();
         require(_bETHprice > 0, "Invalid price rate response");
-        return fdiv((uint256(_bETHprice) * _scalingFactorbETH), _getETHRate(), 1 ether);
+        return fdiv(_getETHRate(), (uint256(_bETHprice) * _scalingFactorbETH), 1 ether);
     } 
 
     function getRate() external view override returns (uint256 rate) {
