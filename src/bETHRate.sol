@@ -20,28 +20,18 @@ contract bETHRate is IRateProvider {
     constructor(address _feed, address _bethfeed) {
         pricefeed = AggregatorV3Interface(_feed);
         bETHPriceFeed = IbETHPriceFeed(_bethfeed);
-        _scalingFactor = 10**SafeMath.sub(18, AggregatorV3Interface(_feed).decimals());
+        _scalingFactor = 10**SafeMath.sub(36, AggregatorV3Interface(_feed).decimals());
         _scalingFactorbETH = 10**SafeMath.sub(18, IbETHPriceFeed(_bethfeed).decimals());
     }
 
-    /**
-     * @return the value of the quote currency in terms of the base currency
-     */
-    function _getETHRate() internal view returns (uint256) {
-        (, int256 price, , , ) = pricefeed.latestRoundData();
-        require(price > 0, "Invalid price rate response");
-        return uint256(price) * _scalingFactor;
-    }
-
-    function _getbETHConversion() internal view returns (uint256) {
-        int256 _bETHprice;
-        _bETHprice = bETHPriceFeed.latestAnswer();
-        require(_bETHprice > 0, "Invalid price rate response");
-        return fdiv(_getETHRate(), (uint256(_bETHprice) * _scalingFactorbETH), 1 ether);
-    } 
-
     function getRate() external view override returns (uint256 rate) {
-        rate = _getbETHConversion();
+        (, int256 ethPrice, , , ) = pricefeed.latestRoundData();
+        require(ethPrice > 0, "Invalid price rate response");
+        uint256 _ethPrice = uint256(ethPrice) * _scalingFactor;
+        int256 bETHprice = bETHPriceFeed.latestAnswer();
+        require(bETHprice > 0, "Invalid price rate response");
+        uint256 _bETHPrice = uint256(bETHprice) * _scalingFactorbETH;
+        rate = fdiv(_ethPrice, _bETHPrice, 1 ether);
         return rate;
     }
 
