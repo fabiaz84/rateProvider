@@ -20,7 +20,7 @@ contract bETHRate is IRateProvider {
     constructor(address _feed, address _bethfeed) {
         pricefeed = AggregatorV3Interface(_feed);
         bETHPriceFeed = IbETHPriceFeed(_bethfeed);
-        _scalingFactor = 10**SafeMath.sub(36, AggregatorV3Interface(_feed).decimals());
+        _scalingFactor = 10**SafeMath.sub(18, AggregatorV3Interface(_feed).decimals());
         _scalingFactorbETH = 10**SafeMath.sub(18, IbETHPriceFeed(_bethfeed).decimals());
     }
 
